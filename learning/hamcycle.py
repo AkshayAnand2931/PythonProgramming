@@ -53,7 +53,7 @@ class Graph():
                       for row in range(vertices)]
         self.V = vertices
 
-    def isSafe(self, v, pos, path):
+    def isSafe(self, v, pos, path,diff):
 
         if self.graph[path[pos-1]][v] == 0:
             return False
@@ -61,10 +61,16 @@ class Graph():
         for vertex in path:
             if vertex == v:
                 return False
-
+        
+        if pos > 1:
+            if abs(path[pos-2] - v) == diff:
+                return True
+            else:
+                return False
+    
         return True
 
-    def hamCycleUtil(self, path, pos):
+    def hamCycleUtil(self, path, pos,diff):
 
         if pos == self.V:
 
@@ -77,27 +83,27 @@ class Graph():
 
         for v in range(1, self.V):
 
-            if self.isSafe(v, pos, path) == True:
+            if self.isSafe(v, pos, path,diff) == True:
 
                 path[pos] = v
                 self.graph[path[pos-1]][v] = 0
                 self.graph[v][path[pos-1]] = 0
 
-                if self.hamCycleUtil(path, pos+1) == True:
+                if self.hamCycleUtil(path, pos+1,diff) == True:
                     return True
 
                 self.graph[path[pos-1]][v] = 1
                 self.graph[v][path[pos-1]] = 1
                 path[pos] = -1
-
+            print(path)
         return False
 
-    def hamCycle(self):
+    def hamCycle(self,diff):
         path = [-1] * self.V
 
         path[0] = 0
 
-        if self.hamCycleUtil(path, 1) == False:
+        if self.hamCycleUtil(path, 1,diff) == False:
             print("Solution does not exist\n")
             return False
 
@@ -112,9 +118,12 @@ class Graph():
 
     def numHamCycles(self):
         count = 0
+        prime_list = pi_list(self.V//2)
+        prime_list.insert(0,1)
         while 1 in self.graph[0]:
             print(self.graph)
-            if self.hamCycle() == False:
+            print("The difference should be {}".format(prime_list[count]))
+            if self.hamCycle(prime_list[count]) == False:
                 break
             else:
                 count = count + 1
@@ -130,7 +139,7 @@ class Graph():
         return disjoint//2
 
 if __name__ == "__main__":
-    n = int(input("Enter the value of n"))
+    n = int(input("Enter the value of n: "))
     g1 = Graph(2*n)
     g1.graph = knodel_adjacency(n)
     print("The number of cycles is {}".format(g1.numHamCycles()))
