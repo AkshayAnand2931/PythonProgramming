@@ -52,6 +52,8 @@ class Graph():
         self.graph = [[0 for column in range(vertices)]
                       for row in range(vertices)]
         self.V = vertices
+        self.vertices_i = list(range(0,self.V//2))
+        self.vertices_j = list(range(self.V//2,self.V))
 
     def isSafe(self, v, pos, path,diff):
 
@@ -63,10 +65,21 @@ class Graph():
                 return False
         
         if pos > 1:
-            if abs(path[pos-2] - v) == diff:
-                return True
+            if v >= self.V//2:
+                index = self.vertices_j.index(path[pos-2])
+                count = (index + diff) % len(self.vertices_j)
+                if self.vertices_j[count] == v:
+                    return True
+                else:
+                    return False
+                
             else:
-                return False
+                index = self.vertices_i.index(path[pos-2])
+                count = (index + diff) % len(self.vertices_i)
+                if self.vertices_i[count] == v:
+                    return True
+                else:
+                    return False
     
         return True
 
@@ -95,7 +108,7 @@ class Graph():
                 self.graph[path[pos-1]][v] = 1
                 self.graph[v][path[pos-1]] = 1
                 path[pos] = -1
-            print(path)
+            #print(path)
         return False
 
     def hamCycle(self,diff):
@@ -104,25 +117,25 @@ class Graph():
         path[0] = 0
 
         if self.hamCycleUtil(path, 1,diff) == False:
-            print("Solution does not exist\n")
+            #print("Solution does not exist\n")
             return False
 
-        self.printSolution(path)
+        self.printSolution(path,diff)
         return True
 
-    def printSolution(self, path):
-        print("Solution Exists: Following is one Hamiltonian Cycle")
+    def printSolution(self, path,diff):
+        #print("Solution Exists: Following is one Hamiltonian Cycle")
+        print("The difference should be {}".format(diff))
         for vertex in path:
-            print(vertex, end=" ")
-        print(path[0], "\n")
+            print(vertex+1, end=" ")
+        print(path[0]+1)
 
     def numHamCycles(self):
         count = 0
         prime_list = pi_list(self.V//2)
         prime_list.insert(0,1)
         while 1 in self.graph[0]:
-            print(self.graph)
-            print("The difference should be {}".format(prime_list[count]))
+            #print(self.graph)
             if self.hamCycle(prime_list[count]) == False:
                 break
             else:
